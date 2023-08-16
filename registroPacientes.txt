@@ -1,0 +1,11 @@
+Nome -> Rodrigo Amaral Andrade
+Peso -> 72
+Altura -> 170
+IMC -> 24.9135 --- Normal
+____________________________________________________
+
+Nome -> Silmara Luiza
+Peso -> 63
+Altura -> 163
+IMC -> 23.7118 --- Normal
+____________________________________________________
