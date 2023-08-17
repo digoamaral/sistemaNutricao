@@ -3,13 +3,11 @@
 #include <cmath>
 #include <string>
 
-
 using namespace std;
 
 struct paciente{
     std::string nome, interpretacaoIMC;
     float peso, altura, IMC;
-    
 };
 
 struct paciente includePaciente;
@@ -35,7 +33,6 @@ float calculaIMC(){
 
     return includePaciente.IMC;
 }
-
 
 void incluirPaciente(const std::string& nome, float peso, float altura){
 
