@@ -2,123 +2,194 @@
 #include <fstream>
 #include <cmath>
 #include <string>
+#include <vector>
+#include <clocale>
 
 using namespace std;
+vector <int> repeatedLinesFound;
 
 struct paciente{
-    std::string nome, interpretacaoIMC;
+    string nome, interpretacaoIMC;
     float peso, altura, IMC;
+    char sexo;
 };
 
-struct paciente includePaciente;
+struct paciente newPatient;
 
 void getDados(){
-    std::cout << "Nome: ";
+    cout << "Nome: ";
     cin.ignore();
-    std::getline(std::cin, includePaciente.nome);
+    getline(cin, newPatient.nome);
     cin.clear();
-    std::cout << "Peso: ";
-    std::cin >> includePaciente.peso;
+    cout << "Peso: ";
+    cin >> newPatient.peso;
     cin.clear();
-    std::cout << "Altura: ";
-    std::cin >> includePaciente.altura;
+    cout << "Altura(cm): ";
+    cin >> newPatient.altura;
     cin.clear();
+    cout << "sexo\n (M -> Masculino\n F -> Feminino\n->)";
+    cin >> newPatient.sexo;
 }
 
-float calculaIMC(){
-    includePaciente.IMC = includePaciente.peso/pow(includePaciente.altura/100, 2);
-    if(includePaciente.IMC >= 18.5 && includePaciente.IMC < 25){
-        includePaciente.interpretacaoIMC = "Normal";
-    } 
-
-    return includePaciente.IMC;
+int calculaIMC(){
+    newPatient.IMC = newPatient.peso/pow(newPatient.altura/100, 2);
+    if (newPatient.IMC < 18.5 ){
+        newPatient.interpretacaoIMC = "Magreza";
+    } else if(newPatient.IMC >= 18.5 && newPatient.IMC < 25){
+        newPatient.interpretacaoIMC = "Normal";
+    } else if (newPatient.IMC >= 25 && newPatient.IMC < 30){
+        newPatient.interpretacaoIMC = "Sobrepeso";
+    } else if (newPatient.IMC >= 30 && newPatient.IMC <= 40){
+        newPatient.interpretacaoIMC = "Obesidade";
+    } else {
+        newPatient.interpretacaoIMC = "Obesidade Grave";
+    }
+    
+    return EXIT_SUCCESS;
 }
 
-void incluirPaciente(const std::string& nome, float peso, float altura){
+int incluirPaciente(const string& nome, float peso, float altura){
 
-
-    std::ofstream myfile("registroPacientes.txt", std::ios::app);
+    ofstream myfile("registroPacientes.txt", ios::app);
 
     if(myfile.is_open()){
-        myfile << "\nNome -> " << includePaciente.nome << "\n"; 
-        myfile << "Peso -> " << includePaciente.peso << "\n";
-        myfile << "Altura -> " << includePaciente.altura << "\n";
-        myfile << "IMC -> " << includePaciente.IMC << " --- " << includePaciente.interpretacaoIMC << "\n";
-        myfile << "____________________________________________________\n";
+        myfile << "\nNome   -> " << newPatient.nome << endl; 
+        if(newPatient.sexo == 'M' || newPatient.sexo == 'm'){
+            myfile << "Sexo   -> " << "Masculino" << endl; 
+        } else {
+            myfile << "Sexo   -> " << "Feminino" << endl; 
+        }
+        myfile << "Peso   -> " << newPatient.peso << endl;
+        myfile << "Altura -> " << newPatient.altura << endl;
+        myfile << "IMC    -> " << newPatient.IMC << " --- Condição: " << newPatient.interpretacaoIMC << endl;
+        
+        myfile << "____________________________________________________" << endl;
         myfile.close();
     } else {
-        std::cerr << "Não foi possível abrir o arquivo." << std::endl;
+        cerr << "Não foi possível abrir o arquivo." << endl;
     }
+
+    return EXIT_SUCCESS;
+}
+
+int exibirPacientes(){
+
+    ifstream myfile("registroPacientes.txt", ios::app);
+
+    if(myfile.is_open()){
+
+        string linha;
+
+        while (getline(myfile, linha)) {
+            cout << linha << std::endl;
+        }
+        myfile.close();
+
+    } else {
+        cerr << "Não foi possível abrir o arquivo." << endl;
+    }
+
+    return EXIT_SUCCESS;
 
 }
 
-void editarPaciente(){
-    string substring, x;
+int buscarPaciente(){
+    string substring, atualLine;
     int line = 1;
-    bool ans=false;
+    bool findedLine = false;
 
+    cout << "Digite o nome: "<<endl;
+    cin.ignore();
+    getline(cin, substring);
 
-    cout << "Digite o nome: "<<endl;  
-    cin >> substring;
-
-    std::ifstream myfile("registroPacientes.txt", std::ios::app);
-
+    ifstream myfile("registroPacientes.txt", ios::app);
+    
     if(myfile.is_open()){
-        while ( getline (myfile, x) ){
-            if (x.find(substring, 0) != string::npos) {
-                cout<<"Paciente na linha -> "<<line<<endl;
-                ans=true;     
+        while (getline (myfile, atualLine)){
+            if (atualLine.find(substring, 0) != string::npos) {
+                repeatedLinesFound.push_back(line);
+                findedLine = true;  
             }
             line++;
         }
     } else {
-        std::cerr << "Não foi possível abrir o arquivo." << std::endl;
-    }
+        cerr << "Não foi possível abrir o arquivo." << endl;
+    } 
 
-    if(!ans)   // if subtring not present.
-        cout<<"Paciente não encontrado(a)"<<endl;
+    if(!findedLine) {
+        cout << "Paciente não encontrado(a)" << endl;
+    }  
 
     myfile.close();
+
+    cout << "Linhas quem contem a busca: " << endl;
+    for (int index = 0; index < repeatedLinesFound.size(); index++ ){
+        cout << repeatedLinesFound[index] << endl;
+    }
+
+    repeatedLinesFound.erase(repeatedLinesFound.begin(), repeatedLinesFound.end());
+
+    return EXIT_SUCCESS;
 }
 
-int opcaoEscolhida;
+int excluirPaciente(){
+
+    buscarPaciente();
+    string line;
+    ofstream myfile("registroPacientes.txt", ios::app);
+
+    if(myfile.is_open()){
+        
+
+        myfile.close();
+    } else {
+        cerr << "Não foi possível abrir o arquivo." << endl;
+    }
+
+    return EXIT_SUCCESS;
+}
+
 void menu(){
 
-    std::cout << "\nEscolha uma das opcoes";
-    std::cout << "\n1.....Inserir Paciente";
-    std::cout << "\n2.....Editar Paciente";
-    std::cout << "\n3.....Excluir Paciente";
-    std::cout << "\n4.....Buscar Paciente";
-    std::cout << "\n5.....Sair do programa";
-    std::cout << "\n------> ";
+    int opcaoEscolhida;
 
-    
-    std::cin >> opcaoEscolhida;
+    do{
+        cout << "\nEscolha uma das opções" << endl;
+        cout << "1.....Inserir Paciente" << endl;
+        cout << "2.....Editar Paciente" << endl;
+        cout << "3.....Excluir Paciente" << endl;
+        cout << "4.....Buscar Paciente" << endl;
+        cout << "5.....Exibir Pacientes" << endl;
+        cout << "0.....Sair do programa\n" << endl;
+        cout << "------> " ;
 
-    switch (opcaoEscolhida){
-        case 1:
-            getDados();
-            calculaIMC();
-            incluirPaciente(includePaciente.nome, includePaciente.peso, includePaciente.altura);
+        cin >> opcaoEscolhida;
 
-            break;
-        case 2:
-            editarPaciente();
-            break;
-        case 3:
-            /* code */
-            break;
-        case 4:
-            /* code */
-            break;
-        case 5:
-            cout << "Saindo...\n";
-            break;       
-        default:
-            cout <<"Opção inválida";
-            break;
-    }
+        switch (opcaoEscolhida){
+            case 1:
+                getDados();
+                calculaIMC();
+                incluirPaciente(newPatient.nome, newPatient.peso, newPatient.altura);
+                break;
+            case 2:
+                buscarPaciente();
+                break;
+            case 3:
+                excluirPaciente();
+                break;
+            case 4:
+                buscarPaciente();
+                break;
+            case 5:
+                exibirPacientes();
+                break;       
+            case 0:
+                cout << "Saindo...\n";
+                break;       
+            default:
+                cout <<"Opcao invalida";
+                menu();
+                break;
+        }
+    }while(opcaoEscolhida != 0);
 }
-
-
-
