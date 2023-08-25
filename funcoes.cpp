@@ -1,3 +1,5 @@
+//Feito por Rodrigo Amaral Andrade
+
 #include <iostream>
 #include <fstream>
 #include <cmath>
@@ -27,28 +29,11 @@ void getDados(){
     cout << "Altura(cm): ";
     cin >> newPatient.altura;
     cin.clear();
-    cout << "sexo\n (M -> Masculino\n F -> Feminino\n->)";
+    cout << "sexo\n (M -> Masculino | F -> Feminino)\n->";
     cin >> newPatient.sexo;
 }
 
-int calculaIMC(){
-    newPatient.IMC = newPatient.peso/pow(newPatient.altura/100, 2);
-    if (newPatient.IMC < 18.5 ){
-        newPatient.interpretacaoIMC = "Magreza";
-    } else if(newPatient.IMC >= 18.5 && newPatient.IMC < 25){
-        newPatient.interpretacaoIMC = "Normal";
-    } else if (newPatient.IMC >= 25 && newPatient.IMC < 30){
-        newPatient.interpretacaoIMC = "Sobrepeso";
-    } else if (newPatient.IMC >= 30 && newPatient.IMC <= 40){
-        newPatient.interpretacaoIMC = "Obesidade";
-    } else {
-        newPatient.interpretacaoIMC = "Obesidade Grave";
-    }
-    
-    return EXIT_SUCCESS;
-}
-
-int incluirPaciente(const string& nome, float peso, float altura){
+int escreverNoArquivo(const string& nome, float peso, float altura){
 
     ofstream myfile("registroPacientes.txt", ios::app);
 
@@ -56,8 +41,10 @@ int incluirPaciente(const string& nome, float peso, float altura){
         myfile << "\nNome   -> " << newPatient.nome << endl; 
         if(newPatient.sexo == 'M' || newPatient.sexo == 'm'){
             myfile << "Sexo   -> " << "Masculino" << endl; 
-        } else {
+        } else if(newPatient.sexo == 'F' || newPatient.sexo == 'f') {
             myfile << "Sexo   -> " << "Feminino" << endl; 
+        } else {
+            cout << "Dado incorreto";
         }
         myfile << "Peso   -> " << newPatient.peso << endl;
         myfile << "Altura -> " << newPatient.altura << endl;
@@ -71,6 +58,33 @@ int incluirPaciente(const string& nome, float peso, float altura){
 
     return EXIT_SUCCESS;
 }
+
+float calculaIMC(){
+    newPatient.IMC = newPatient.peso/pow(newPatient.altura/100, 2);
+    if (newPatient.IMC < 18.5 ){
+        newPatient.interpretacaoIMC = "Magreza";
+    } else if(newPatient.IMC >= 18.5 && newPatient.IMC < 25){
+        newPatient.interpretacaoIMC = "Normal";
+    } else if (newPatient.IMC >= 25 && newPatient.IMC < 30){
+        newPatient.interpretacaoIMC = "Sobrepeso";
+    } else if (newPatient.IMC >= 30 && newPatient.IMC <= 40){
+        newPatient.interpretacaoIMC = "Obesidade";
+    } else {
+        newPatient.interpretacaoIMC = "Obesidade Grave";
+    }
+    
+    return newPatient.IMC;
+}
+
+float calculaPesoMax(){
+    
+}
+
+int calculaPesoIdeal(){
+
+
+}
+
 
 int exibirPacientes(){
 
@@ -90,7 +104,6 @@ int exibirPacientes(){
     }
 
     return EXIT_SUCCESS;
-
 }
 
 int buscarPaciente(){
@@ -122,7 +135,7 @@ int buscarPaciente(){
 
     myfile.close();
 
-    cout << "Linhas quem contem a busca: " << endl;
+    cout << "Linha(s) que contem a busca: " << endl;
     for (int index = 0; index < repeatedLinesFound.size(); index++ ){
         cout << repeatedLinesFound[index] << endl;
     }
@@ -132,25 +145,39 @@ int buscarPaciente(){
     return EXIT_SUCCESS;
 }
 
-int excluirPaciente(){
-
-    buscarPaciente();
-    string line;
-    ofstream myfile("registroPacientes.txt", ios::app);
-
-    if(myfile.is_open()){
-        
-
-        myfile.close();
-    } else {
-        cerr << "Não foi possível abrir o arquivo." << endl;
-    }
+int incluirPaciente(){
+    getDados();
+    calculaIMC();
+    escreverNoArquivo(newPatient.nome, newPatient.peso, newPatient.altura);
 
     return EXIT_SUCCESS;
 }
 
-void menu(){
+int excluirPaciente(){
 
+    cout << "Funcionalidade em desenvolvimento" << endl;
+    // buscarPaciente();
+    // string line;
+    // ofstream myfile("registroPacientes.txt", ios::app);
+
+    // if(myfile.is_open()){
+        
+
+    //     myfile.close();
+    // } else {
+    //     cerr << "Não foi possível abrir o arquivo." << endl;
+    // }
+
+    return EXIT_SUCCESS;
+}
+
+int editarPaciente(){
+
+    cout << "Funcionalidade em desenvolvimento" << endl;
+    return EXIT_SUCCESS;
+}
+
+void menu(){
     int opcaoEscolhida;
 
     do{
@@ -160,19 +187,17 @@ void menu(){
         cout << "3.....Excluir Paciente" << endl;
         cout << "4.....Buscar Paciente" << endl;
         cout << "5.....Exibir Pacientes" << endl;
-        cout << "0.....Sair do programa\n" << endl;
+        cout << "6.....Sair do programa\n" << endl;
         cout << "------> " ;
 
         cin >> opcaoEscolhida;
 
         switch (opcaoEscolhida){
             case 1:
-                getDados();
-                calculaIMC();
-                incluirPaciente(newPatient.nome, newPatient.peso, newPatient.altura);
+                incluirPaciente();
                 break;
             case 2:
-                buscarPaciente();
+                editarPaciente();
                 break;
             case 3:
                 excluirPaciente();
@@ -183,13 +208,13 @@ void menu(){
             case 5:
                 exibirPacientes();
                 break;       
-            case 0:
+            case 6:
                 cout << "Saindo...\n";
                 break;       
             default:
                 cout <<"Opcao invalida";
-                menu();
                 break;
         }
-    }while(opcaoEscolhida != 0);
+    }while(opcaoEscolhida != 6);
+    
 }
